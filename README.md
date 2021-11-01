@@ -1,6 +1,6 @@
 # MOS-Multi-Task-Face-Detect
 <div align="center"><img src="figures/MOS_Overall.png" width="400"></div>
-<img src="figures/MOS_Overall.png" >
+
 
 ## Introduction
 This repo is the official implementation of "MOS: A Low Latency and Lightweight Framework for Face Detection, Landmark Localization, and Head Pose Estimation". The paper has been accepted at BMVC2021.
