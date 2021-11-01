@@ -19,13 +19,27 @@ For more details, please refer to our [report on Arxiv](https://arxiv.org/abs/21
 - [ ] Ncnn inference code.
 - [ ] The fastest version: MOS-tiny.
 
-## Benchmark
-#### Light Models.
 
-|Model |backbone |easy | medium |hard| weights |
-| ------        |:---:  |  :---:       |:---:     |:---:  | :---: |
-|MOS-M|mobilenetV2  |94.08  | 93.21 |88.06 | MOS-M.pth |
-|MOS-S|shufflenetV2 |93.28 | 92.12 |86.97 | MOS-S.pth |
+## Benchmark
+<img src="https://github.com/shamangary/FSA-Net/blob/master/Compare_AFLW2000_gt_Hopenet_FSA.gif" height="320"/>
+#### Light Models.
+WiderFace Val Performance is in multi scale and Pose evaluation is using AFLW2000 in 300X300 as image input.
+
+|Model |backbone |easy | medium |hard| pitch | yaw | roll |
+| ------        |:---:  |  :---:       |:---:     |:---:  | :---: |:---: |:---: 
+|MOS-M|mobilenetV2  |94.08  | 93.21 |88.06 | 6.67 |4.43 |5.83 |
+|MOS-S|shufflenetV2 |93.28 | 92.12 |86.97 | 6.80 |4.28 |5.99 |
+#### generate widerface validation results
+1. Generate txt file
+```Shell
+python test_widerface.py --network cfg_mos_m --trained_model ./test_weights/MOS-M.pth
+```
+2. Evaluate txt results. Demo come from [Here](https://github.com/wondervictor/WiderFace-Evaluation)
+```Shell
+cd ./widerface_evaluate
+python setup.py build_ext --inplace
+python evaluation.py
+```
 
 ## Training data
 1. Download annotations (face bounding boxes & five facial landmarks & pose angle(pitch,yaw,roll)) from [baidu cloud](https://pan.baidu.com/s/1GizI6v9p0yUnh2sCWaDERg) , the code is 0925. 
@@ -68,6 +82,12 @@ Step2. Run Pytorch inference demo.
 python detect_picture.py --network cfg_mos_m --trained_model ./test_weights/MOS-M.pth
 ## run the MOS-S model
 python detect_picture.py --network cfg_mos_s --trained_model ./test_weights/MOS-S.pth
+```
+
+Step2. Run video inference demo.
+```shell
+## run the MOS-M model 
+python detect_video.py --network cfg_mos_m --trained_model ./test_weights/MOS-M.pth
 ```
 
 ## Cite MOS

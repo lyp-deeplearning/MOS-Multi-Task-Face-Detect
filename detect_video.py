@@ -130,136 +130,157 @@ if __name__ == '__main__':
     device=torch.device("cuda")
     net = net.to(device)
 
-    image_path = "./figures/4_Dancing_Dancing_4_85.jpg"
-    img_raw = cv2.imread(image_path, cv2.IMREAD_COLOR)
-    img = np.float32(img_raw)
+    ## read the video
+    capture = cv2.VideoCapture("/home/lyp/mos_source_code_open/face.avi")
+    ## save the video
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    out = cv2.VideoWriter('./face.avi', fourcc, 20.0, (int(capture.get(3)), int(capture.get(4))))
 
-    # testing scale
-    target_size = args.long_side
-    max_size = args.long_side
-    im_shape = img.shape
-    im_size_min = np.min(im_shape[0:2])
-    im_size_max = np.max(im_shape[0:2])
-    resize = float(target_size) / float(im_size_min)
-    # prevent bigger axis from being more than max_size:
-    if np.round(resize * im_size_max) > max_size:
-        resize = float(max_size) / float(im_size_max)
-    if args.origin_size:
-        resize = 1
+    while (True):
+        ref, frame = capture.read()
 
-    if resize != 1:
-        img = cv2.resize(img, None, None, fx=resize, fy=resize, interpolation=cv2.INTER_LINEAR)
+        img_raw = frame
+        img = np.float32(img_raw)
 
-    img_rgb = img_raw.copy()
-    im_height, im_width, _ = img.shape
-    print(im_height, im_width)
+        # testing scale
+        target_size = args.long_side
+        max_size = args.long_side
+        im_shape = img.shape
+        im_size_min = np.min(im_shape[0:2])
+        im_size_max = np.max(im_shape[0:2])
+        resize = float(target_size) / float(im_size_min)
+        # prevent bigger axis from being more than max_size:
+        if np.round(resize * im_size_max) > max_size:
+            resize = float(max_size) / float(im_size_max)
+        if args.origin_size:
+            resize = 1
 
-    scale = torch.Tensor([img.shape[1], img.shape[0], img.shape[1], img.shape[0]])
-    img -= (104, 117, 123)
-    img = img.transpose(2, 0, 1)
-    img = torch.from_numpy(img).unsqueeze(0)
-    img = img.to(device)
-    scale = scale.to(device)
+        if resize != 1:
+            img = cv2.resize(img, None, None, fx=resize, fy=resize, interpolation=cv2.INTER_LINEAR)
 
-    tic = time.time()
-    loc, conf, landms, head_cls_y, head_cls_p, head_cls_r = net(img)  # forward pass
-    tic1 = time.time() - tic
+        img_rgb = img_raw.copy()
+        im_height, im_width, _ = img.shape
+        #print(im_height, im_width)
 
-    head_cls_y = head_cls_y.squeeze(0)
-    head_cls_p = head_cls_p.squeeze(0)
-    head_cls_r = head_cls_r.squeeze(0)
-    idx_tensor = [idx for idx in range(66)]
-    idx_tensor = torch.FloatTensor(idx_tensor).to(device)
+        scale = torch.Tensor([img.shape[1], img.shape[0], img.shape[1], img.shape[0]])
+        img -= (104, 117, 123)
+        img = img.transpose(2, 0, 1)
+        img = torch.from_numpy(img).unsqueeze(0)
+        img = img.to(device)
+        scale = scale.to(device)
 
-    head_cls_y = torch.sum(head_cls_y * idx_tensor, 1).to(device) * 3 - 99
-    head_cls_p = torch.sum(head_cls_p * idx_tensor, 1).to(device) * 3 - 99
-    head_cls_r = torch.sum(head_cls_r * idx_tensor, 1).to(device) * 3 - 99
+        tic = time.time()
+        loc, conf, landms, head_cls_y, head_cls_p, head_cls_r = net(img)  # forward pass
+        tic1 = time.time() - tic
 
-    priorbox = PriorBox(cfg, image_size=(im_height, im_width))
-    priors = priorbox.forward()
-    priors = priors.to(device)
-    prior_data = priors.data
-    boxes = decode(loc.data.squeeze(0), prior_data, cfg['variance'])
-    boxes = boxes * scale / resize
-    boxes = boxes.cpu().numpy()
-    scores = conf.squeeze(0).data.cpu().numpy()[:, 1]
-    landms = decode_landm(landms.data.squeeze(0), prior_data, cfg['variance'])
+        head_cls_y = head_cls_y.squeeze(0)
+        head_cls_p = head_cls_p.squeeze(0)
+        head_cls_r = head_cls_r.squeeze(0)
+        idx_tensor = [idx for idx in range(66)]
+        idx_tensor = torch.FloatTensor(idx_tensor).to(device)
 
-    head_cls_y = head_cls_y.cpu().numpy()
-    head_cls_p = head_cls_p.cpu().numpy()
-    head_cls_r = head_cls_r.cpu().numpy()
+        head_cls_y = torch.sum(head_cls_y * idx_tensor, 1).to(device) * 3 - 99
+        head_cls_p = torch.sum(head_cls_p * idx_tensor, 1).to(device) * 3 - 99
+        head_cls_r = torch.sum(head_cls_r * idx_tensor, 1).to(device) * 3 - 99
 
-    scale1 = torch.Tensor([img.shape[3], img.shape[2], img.shape[3], img.shape[2],
-                           img.shape[3], img.shape[2], img.shape[3], img.shape[2],
-                           img.shape[3], img.shape[2]])
-    scale1 = scale1.to(device)
-    landms = landms * scale1 / resize
-    landms = landms.cpu().numpy()
+        priorbox = PriorBox(cfg, image_size=(im_height, im_width))
+        priors = priorbox.forward()
+        priors = priors.to(device)
+        prior_data = priors.data
+        boxes = decode(loc.data.squeeze(0), prior_data, cfg['variance'])
+        boxes = boxes * scale / resize
+        boxes = boxes.cpu().numpy()
+        scores = conf.squeeze(0).data.cpu().numpy()[:, 1]
+        landms = decode_landm(landms.data.squeeze(0), prior_data, cfg['variance'])
 
-    # ignore low scores
-    inds = np.where(scores > args.confidence_threshold)[0]
-    boxes = boxes[inds]
-    landms = landms[inds]
-    scores = scores[inds]
-    head_cls_y = head_cls_y[inds]
-    head_cls_p = head_cls_p[inds]
-    head_cls_r = head_cls_r[inds]
+        head_cls_y = head_cls_y.cpu().numpy()
+        head_cls_p = head_cls_p.cpu().numpy()
+        head_cls_r = head_cls_r.cpu().numpy()
 
-    # keep top-K before NMS
-    order = scores.argsort()[::-1][:args.top_k]
-    boxes = boxes[order]
-    landms = landms[order]
-    scores = scores[order]
-    head_cls_y = head_cls_y[order]
-    head_cls_p = head_cls_p[order]
-    head_cls_r = head_cls_r[order]
-    idx_tensor = [idx for idx in range(66)]
-    idx_tensor = np.array(idx_tensor)
+        scale1 = torch.Tensor([img.shape[3], img.shape[2], img.shape[3], img.shape[2],
+                               img.shape[3], img.shape[2], img.shape[3], img.shape[2],
+                               img.shape[3], img.shape[2]])
+        scale1 = scale1.to(device)
+        landms = landms * scale1 / resize
+        landms = landms.cpu().numpy()
 
-    # do NMS
-    dets = np.hstack((boxes, scores[:, np.newaxis])).astype(np.float32, copy=False)
-    keep = py_cpu_nms(dets, args.nms_threshold)
-    dets = dets[keep, :]
-    landms = landms[keep]
-    yaw_predicted = head_cls_y[keep]
-    pitch_predicted = head_cls_p[keep]
-    roll_predicted = head_cls_r[keep]
+        # ignore low scores
+        inds = np.where(scores > args.confidence_threshold)[0]
+        boxes = boxes[inds]
+        landms = landms[inds]
+        scores = scores[inds]
+        head_cls_y = head_cls_y[inds]
+        head_cls_p = head_cls_p[inds]
+        head_cls_r = head_cls_r[inds]
 
-    dets = dets[:args.keep_top_k, :]
-    landms = landms[:args.keep_top_k, :]
-    yaw_predicted = yaw_predicted[:args.keep_top_k]
-    pitch_predicted = pitch_predicted[:args.keep_top_k]
-    roll_predicted = roll_predicted[:args.keep_top_k]
+        # keep top-K before NMS
+        order = scores.argsort()[::-1][:args.top_k]
+        boxes = boxes[order]
+        landms = landms[order]
+        scores = scores[order]
+        head_cls_y = head_cls_y[order]
+        head_cls_p = head_cls_p[order]
+        head_cls_r = head_cls_r[order]
+        idx_tensor = [idx for idx in range(66)]
+        idx_tensor = np.array(idx_tensor)
 
-    dets = np.concatenate((dets, landms), axis=1)
-    for i in range(len(dets)):
-        b = dets[i]
-        if b[4] < args.vis_thres:
-            continue
-        text = "{:.4f}".format(b[4])
-        b = list(map(int, b))
-        cv2.rectangle(img_rgb, (b[0], b[1]), (b[2], b[3]), (0, 0, 255), 3)
-        cx = b[0]
-        cy = b[1] + 12
+        # do NMS
+        dets = np.hstack((boxes, scores[:, np.newaxis])).astype(np.float32, copy=False)
+        keep = py_cpu_nms(dets, args.nms_threshold)
+        dets = dets[keep, :]
+        landms = landms[keep]
+        yaw_predicted = head_cls_y[keep]
+        pitch_predicted = head_cls_p[keep]
+        roll_predicted = head_cls_r[keep]
 
+        dets = dets[:args.keep_top_k, :]
+        landms = landms[:args.keep_top_k, :]
+        yaw_predicted = yaw_predicted[:args.keep_top_k]
+        pitch_predicted = pitch_predicted[:args.keep_top_k]
+        roll_predicted = roll_predicted[:args.keep_top_k]
 
-        text = "yaw:" + str(int(yaw_predicted[i]))  # + "," + "p:" + str(int(pitch_predicted[i])) + "," + "r:" + str(
-        # int(roll_predicted[i]))
-
-        cv2.putText(img_rgb, text, (cx - 10, cy - 25),
-                    cv2.FONT_HERSHEY_TRIPLEX, 0.6, (255, 0, 255))
-        # landms
-        cv2.circle(img_rgb, (b[5], b[6]), 1, (0, 0, 255), 4)
-        cv2.circle(img_rgb, (b[7], b[8]), 1, (0, 255, 255), 4)
-        cv2.circle(img_rgb, (b[9], b[10]), 1, (255, 0, 255), 4)
-        cv2.circle(img_rgb, (b[11], b[12]), 1, (0, 255, 0), 4)
-        cv2.circle(img_rgb, (b[13], b[14]), 1, (255, 0, 0), 4)
-        draw_axis(img_rgb, int(yaw_predicted[i]), int(pitch_predicted[i]), int(roll_predicted[i]), tdx=b[9],
-                  tdy=b[10], size=30)
+        dets = np.concatenate((dets, landms), axis=1)
+        for i in range(len(dets)):
+            b = dets[i]
+            if b[4] < args.vis_thres:
+                continue
+            text = "{:.4f}".format(b[4])
+            b = list(map(int, b))
+            cv2.rectangle(img_rgb, (b[0], b[1]), (b[2], b[3]), (0, 0, 255), 3)
+            cx = b[0]
+            cy = b[1] + 12
 
 
-    #cv2.imshow("frame", img_rgb)
-    cv2.imwrite("./figures/result.jpg", img_rgb)
+            text = "yaw:" + str(int(yaw_predicted[i]))  # + "," + "p:" + str(int(pitch_predicted[i])) + "," + "r:" + str(
+            # int(roll_predicted[i]))
+
+            cv2.putText(img_rgb, text, (cx - 10, cy - 25),
+                        cv2.FONT_HERSHEY_TRIPLEX, 0.6, (255, 0, 255))
+
+            fps_text = "FPS: " + str(int(1 / tic1))
+            cv2.putText(img_rgb, fps_text, (20, 40),
+                        cv2.FONT_HERSHEY_TRIPLEX, 0.6, (0, 255, 0))
+
+            # landms
+            cv2.circle(img_rgb, (b[5], b[6]), 1, (0, 0, 255), 4)
+            cv2.circle(img_rgb, (b[7], b[8]), 1, (0, 255, 255), 4)
+            cv2.circle(img_rgb, (b[9], b[10]), 1, (255, 0, 255), 4)
+            cv2.circle(img_rgb, (b[11], b[12]), 1, (0, 255, 0), 4)
+            cv2.circle(img_rgb, (b[13], b[14]), 1, (255, 0, 0), 4)
+            draw_axis(img_rgb, int(yaw_predicted[i]), int(pitch_predicted[i]), int(roll_predicted[i]), tdx=b[9],
+                      tdy=b[10], size=30)
+
+
+        cv2.imshow("frame", img_rgb)
+        key = cv2.waitKey(1)
+        if key & 0xFF == ord('q') or key == 27:
+            cv2.destroyAllWindows()
+            break
+
+        out.write(img_rgb)
+    capture.release()
+    #cv2.destroyAllWindows()
+
 
 
 

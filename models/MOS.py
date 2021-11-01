@@ -135,7 +135,7 @@ class MOS(nn.Module):
             in_channels_list = [116,232,464]
         elif cfg['name'] == 'mos_m':
             in_channels_list = [32, 96, 320]
-
+        print(cfg['name'])
         out_channels = cfg['out_channel']
         self.fpn = FPN(in_channels_list, out_channels)
         self.ssh1 = SSH(out_channels, out_channels)
