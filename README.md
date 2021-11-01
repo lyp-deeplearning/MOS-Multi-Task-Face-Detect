@@ -1,5 +1,5 @@
 # MOS-Multi-Task-Face-Detect
-<div align="center"><img src="figures/MOS_Overall.png" width="400"></div>
+<div align="center"><img src="figures/MOS_Overall.png" width="600"></div>
 
 
 ## Introduction
