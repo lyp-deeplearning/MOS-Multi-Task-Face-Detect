@@ -1,14 +1,17 @@
 # MOS-Multi-Task-Face-Detect
+<div align="center"><img src="figures/MOS_Overall.png" width="450"></div>
+<img src="figures/MOS_Overall.png" >
 
 ## Introduction
-This repo is the official implementation of "MOS: A Low Latency and Lightweight Framework for Face Detection, Landmark Localization, and Head Pose Estimation"
+This repo is the official implementation of "MOS: A Low Latency and Lightweight Framework for Face Detection, Landmark Localization, and Head Pose Estimation". The paper has been accepted at BMVC2021.
+
 This repo is an implementation of PyTorch. MOS is a low latency and lightweight architecture for face detection, facial landmark localization and head pose estimation.It aims to bridge the gap between research and industrial communities.
 For more details, please refer to our [report on Arxiv](https://arxiv.org/abs/2110.10953).
 
 ## Updates
 * 【2021/10/31】 We have released the training data (widerface with pose label). The pytorch inference code of MOS-S and MOS-M has been released!
 * 【2021/10/22】 We have released our paper on [Arxiv](https://arxiv.org/abs/2110.10953).
-* 【2021/10/15】 "MOS: A Low Latency and Lightweight Framework for Face Detection, Landmark Localization, and Head Pose Estimation" has been accepted by BMVC2021.
+* 【2021/10/15】 "MOS: A Low Latency and Lightweight Framework for Face Detection, Landmark Localization, and Head Pose Estimation" has been accepted at BMVC2021.
 
 ## Comming soon
 - [ ] Tensorrt inference code.
@@ -21,14 +24,27 @@ For more details, please refer to our [report on Arxiv](https://arxiv.org/abs/21
 
 |Model |backbone |easy | medium |hard| weights |
 | ------        |:---:  |  :---:       |:---:     |:---:  | :---: |
-|MOS-M|mobilenetV2  |94.08  | 93.21 |88.06 | MOS-M.pth) |
-|MOS-S|shufflenetV2 |93.28 | 92.12 |86.97 | MOS-S.pth) |
+|MOS-M|mobilenetV2  |94.08  | 93.21 |88.06 | MOS-M.pth |
+|MOS-S|shufflenetV2 |93.28 | 92.12 |86.97 | MOS-S.pth |
 
+## Training data
+1. Download annotations (face bounding boxes & five facial landmarks & pose angle(pitch,yaw,roll)) from [baidu cloud](https://pan.baidu.com/s/1GizI6v9p0yUnh2sCWaDERg) , the code is 0925. 
+2. Organise the dataset directory as follows:
+```Shell
+  ./data/widerface/
+    train/
+      images/
+      label.txt
+```
 
+The annotation file  is like:
+```Shell
+# 0--Parade/0_Parade_marchingband_1_849.jpg
+449 330 122 149 488.906 373.643 0.0 542.089 376.442 0.0 515.031 412.83 0.0 485.174 425.893 0.0 538.357 431.491 0.0 0.82 -6 -6 1
 
-
-
-
+face_x face_y face_width face_height landmark1.x landmark1.y 0.0 landmark2.x landmark2.y 0.0 landmark3.x landmark3.y 0.0 landmark4.x landmark4.y 0.0
+landmark5.x landmark5.y 0.0 confidence pitch yaw roll
+```
 
 ## Quick Start
 
@@ -54,4 +70,14 @@ python detect_picture.py --network cfg_mos_m --trained_model ./test_weights/MOS-
 python detect_picture.py --network cfg_mos_s --trained_model ./test_weights/MOS-S.pth
 ```
 
+## Cite MOS
+If you use MOS in your research, please cite our work by using the following BibTeX entry:
 
+```latex
+@article{liu2021mos,
+  title={MOS: A Low Latency and Lightweight Framework for Face Detection, Landmark Localization, and Head Pose Estimation},
+  author={Liu, Yepeng and Gu, Zaiwang and Gao, Shenghua and Wang, Dong and Zeng, Yusheng and Cheng, Jun},
+  journal={arXiv preprint arXiv:2110.10953},
+  year={2021}
+}
+```
