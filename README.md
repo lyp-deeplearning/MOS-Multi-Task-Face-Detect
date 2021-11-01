@@ -48,7 +48,7 @@ landmark5.x landmark5.y 0.0 confidence pitch yaw roll
 
 ## Quick Start
 
-<details>
+
 <summary>Installation</summary>
 
 Step1. Install MOS.
