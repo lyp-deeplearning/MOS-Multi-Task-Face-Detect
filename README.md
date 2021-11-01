@@ -21,7 +21,7 @@ For more details, please refer to our [report on Arxiv](https://arxiv.org/abs/21
 
 
 ## Benchmark
-<img src="https://github.com/shamangary/FSA-Net/blob/master/Compare_AFLW2000_gt_Hopenet_FSA.gif" height="320"/>
+<img src="https://github.com/lyp-deeplearning/MOS-Multi-Task-Face-Detect/blob/main/figures/face_demo.gif" height="320"/>
 #### Light Models.
 WiderFace Val Performance is in multi scale and Pose evaluation is using AFLW2000 in 300X300 as image input.
 
