@@ -22,6 +22,7 @@ For more details, please refer to our [report on Arxiv](https://arxiv.org/abs/21
 
 ## Benchmark
 <img src="https://github.com/lyp-deeplearning/MOS-Multi-Task-Face-Detect/blob/main/figures/face_demo.gif" height="320"/>
+
 #### Light Models.
 WiderFace Val Performance is in multi scale and Pose evaluation is using AFLW2000 in 300X300 as image input.
 
@@ -31,6 +32,7 @@ WiderFace Val Performance is in multi scale and Pose evaluation is using AFLW200
 |MOS-S|shufflenetV2 |93.28 | 92.12 |86.97 | 6.80 |4.28 |5.99 |
 #### generate widerface validation results
 1. Generate txt file
+You need download the validation and test dataset of WiderFace from [Here](https://github.com/wondervictor/WiderFace-Evaluation)
 ```Shell
 python test_widerface.py --network cfg_mos_m --trained_model ./test_weights/MOS-M.pth
 ```
