@@ -45,6 +45,7 @@ python evaluation.py
 
 ## Training data
 1. Download annotations (face bounding boxes & five facial landmarks & pose angle(pitch,yaw,roll)) from [baidu cloud](https://pan.baidu.com/s/1GizI6v9p0yUnh2sCWaDERg) , the code is 0925. 
+We also provide the [GOOGLE DRIVE]([baidu cloud](https://pan.baidu.com/s/1GizI6v9p0yUnh2sCWaDERg))
 2. Organise the dataset directory as follows:
 ```Shell
   ./data/widerface/
@@ -86,7 +87,7 @@ python detect_picture.py --network cfg_mos_m --trained_model ./test_weights/MOS-
 python detect_picture.py --network cfg_mos_s --trained_model ./test_weights/MOS-S.pth
 ```
 
-Step2. Run video inference demo.
+Step3. Run video inference demo.
 ```shell
 ## run the MOS-M model 
 python detect_video.py --network cfg_mos_m --trained_model ./test_weights/MOS-M.pth
