@@ -45,7 +45,7 @@ python evaluation.py
 
 ## Training data
 1. Download annotations (face bounding boxes & five facial landmarks & pose angle(pitch,yaw,roll)) from [baidu cloud](https://pan.baidu.com/s/1GizI6v9p0yUnh2sCWaDERg) , the code is 0925. 
-We also provide the [GOOGLE DRIVE]([baidu cloud](https://pan.baidu.com/s/1GizI6v9p0yUnh2sCWaDERg))
+We also provide the [GOOGLE DRIVE](https://drive.google.com/file/d/1lwdl1HpVTmWU1yjGYY5NufFdIsdf0R1Q/view?usp=sharing)
 2. Organise the dataset directory as follows:
 ```Shell
   ./data/widerface/
