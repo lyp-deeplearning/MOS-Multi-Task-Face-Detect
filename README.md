@@ -97,10 +97,8 @@ python detect_video.py --network cfg_mos_m --trained_model ./test_weights/MOS-M.
 If you use MOS in your research, please cite our work by using the following BibTeX entry:
 
 ```latex
-@article{liu2021mos,
+@article{liumos,
   title={MOS: A Low Latency and Lightweight Framework for Face Detection, Landmark Localization, and Head Pose Estimation},
-  author={Liu, Yepeng and Gu, Zaiwang and Gao, Shenghua and Wang, Dong and Zeng, Yusheng and Cheng, Jun},
-  journal={arXiv preprint arXiv:2110.10953},
-  year={2021}
+  author={Liu, Yepeng and Gu, Zaiwang and Gao, Shenghua and Wang, Dong and Zeng, Yusheng and Cheng131, Jun}
 }
 ```
